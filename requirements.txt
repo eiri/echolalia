@@ -1,0 +1,2 @@
+requests==2.7.0
+fake-factory==0.5.2
