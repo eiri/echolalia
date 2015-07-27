@@ -33,10 +33,14 @@ $ curl http://localhost:5984/praesentium/_all_docs?include_docs=true -s | jq .ro
 ```
 
 
-Create new database with name `access` and populate it with 53 documents using emplate _access_logs_
+Create new database with name `access` and populate it with 53 documents using template _access_logs_
 
 ```bash
 $ ./echolalia.py -t access_logs -c 53 -n access
+```
+or
+```bash
+$ ./echolalia.py --template access_logs --count 53 --name access
 $ tail -9 echolalia.log 
 2015-07-27 02:08:26 [INFO] - Created database access
 2015-07-27 02:08:26 [INFO] - Populating database with template access_logs
@@ -60,12 +64,9 @@ Delete all databases
 
 ```bash
 $ ./echolalia.py --clear
-$ tail -6 echolalia.log
+$ tail -3 echolalia.log
 2015-07-27 02:13:16 [INFO] - Deleted database access
-2015-07-27 02:13:16 [INFO] - Deleted database distinctio
-2015-07-27 02:13:16 [INFO] - Deleted database molestiae
 2015-07-27 02:13:16 [INFO] - Deleted database praesentium
-2015-07-27 02:13:16 [INFO] - Deleted database twelvebeans
 2015-07-27 02:13:16 [INFO] - Done
 
 $ curl http://localhost:5984/_all_dbs -s | jq .
