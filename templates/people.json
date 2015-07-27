@@ -1,0 +1,9 @@
+{
+  "name": "name",
+  "age": ["random_int", 16, 106],
+  "email": "free_email",
+  "phone": "phone_number",
+  "street": "street_address",
+  "state": "state",
+  "postcode": "postcode"
+}

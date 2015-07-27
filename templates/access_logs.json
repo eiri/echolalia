@@ -1,0 +1,10 @@
+{
+  "time": "date_time_this_year",
+  "ip": "ipv4",
+  "origin": "domain_name",
+  "username": "user_name",
+  "referrer": "md5",
+  "user_agent": "user_agent",
+  "path": "uri_path",
+  "mime_type": "mime_type"
+}
