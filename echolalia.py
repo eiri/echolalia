@@ -16,6 +16,7 @@ def parse_args():
   parser.add_argument('--clear', action='store_true')
   parser.add_argument('-t', '--template', type=str, default='people')
   parser.add_argument('-c', '--count', type=int, default=10)
+  parser.add_argument('-n', '--name', type=str)
   return parser.parse_args()
 
 def init_logging(log_file, debug=True):
@@ -62,8 +63,7 @@ def setup_client(cfg):
     auth = ()
   return True
 
-def create_db():
-  db_name = fake.word()
+def create_db(db_name):
   url = '{base_url}/{db_name}'.format(base_url=base_url, db_name=db_name)
   resp = requests.put(url, auth=auth, headers=headers)
   if resp.status_code != 201:
@@ -138,7 +138,8 @@ def main():
   if args.clear:
     remove_all_dbs()
   else:
-    db_name = create_db()
+    db_name = args.name if args.name is not None else fake.word()
+    create_db(db_name)
     log.info('Populating database with template {}'.format(args.template))
     template_file = 'templates/{}.json'.format(args.template)
     log.debug('Reading template {}'.format(template_file))
