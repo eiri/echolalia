@@ -141,7 +141,10 @@ def main():
     db_name = args.name if args.name is not None else fake.word()
     create_db(db_name)
     log.info('Populating database with template {}'.format(args.template))
-    template_file = 'templates/{}.json'.format(args.template)
+    if os.path.isfile(args.template):
+      template_file = args.template
+    else:
+      template_file = 'templates/{}.json'.format(args.template)
     log.debug('Reading template {}'.format(template_file))
     with open(template_file) as tpl:
       template = json.load(tpl)
