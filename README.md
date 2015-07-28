@@ -76,6 +76,8 @@ $ curl http://localhost:5984/_all_dbs -s | jq .
 ]
 ```
 
+## Templating
+
 ## Licence
 
 [MIT](https://github.com/eiri/echolalia/blob/master/LICENSE)
