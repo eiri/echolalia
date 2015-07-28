@@ -1,6 +1,6 @@
 {
   "name": "name",
-  "age": ["random_int", 16, 106],
+  "age": {"attr" : "random_int", "args": [16, 106]},
   "email": "free_email",
   "phone": "phone_number",
   "street": "street_address",

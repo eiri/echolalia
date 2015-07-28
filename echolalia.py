@@ -73,13 +73,15 @@ def create_db(db_name):
 
 def generate_doc(template):
   doc = {}
-  for key, attr in template.iteritems():
-    if isinstance(attr, list):
-      method = getattr(fake, attr[0])
-      value = method(*attr[1:])
+  for key, method in template.iteritems():
+    if isinstance(method, dict):
+      attr = method['attr']
+      args = method['args']
     else:
-      method = getattr(fake, attr)
-      value = method()
+      attr = method
+      args = ()
+    fun = getattr(fake, attr)
+    value = fun(*args)
     if isinstance(value, (list,dict,str,unicode,int,float,bool,type(None))):
       doc[key] = value
     else:
