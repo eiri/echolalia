@@ -14,6 +14,7 @@ def parse_args():
   parser = argparse.ArgumentParser()
   parser.add_argument('-d', '--debug', action='store_true')
   parser.add_argument('--clear', action='store_true')
+  parser.add_argument('--whitelist', type=str, action='append')
   parser.add_argument('-t', '--template', type=str, default='people')
   parser.add_argument('-c', '--count', type=int, default=10)
   parser.add_argument('-n', '--name', type=str)
@@ -157,6 +158,8 @@ def main():
   setup_client(cfg)
   if args.clear:
     whitelist = [n.strip() for n in cfg.get('couchdb', 'whitelist').split(',')]
+    if args.whitelist is not None:
+      whitelist.extend(args.whitelist)
     remove_all_dbs(whitelist)
   else:
     db_name = args.name if args.name is not None else fake.word()
