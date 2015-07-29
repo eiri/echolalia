@@ -14,6 +14,7 @@ def parse_args():
   parser = argparse.ArgumentParser()
   parser.add_argument('-d', '--debug', action='store_true')
   parser.add_argument('--clear', action='store_true')
+  parser.add_argument('--whitelist', type=str, action='append')
   parser.add_argument('-t', '--template', type=str, default='people')
   parser.add_argument('-c', '--count', type=int, default=10)
   parser.add_argument('-n', '--name', type=str)
@@ -38,7 +39,11 @@ def init_logging(log_file, debug=True):
   return True
 
 def load_config(config_file):
-  Config = ConfigParser.ConfigParser({'user' : None, 'password' : ''})
+  Config = ConfigParser.ConfigParser({
+    'user' : None,
+    'password' : '',
+    'whitelist': ''
+  })
   Config.read(config_file)
   return Config
 
@@ -123,11 +128,16 @@ def create_docs(db_name, template={}, count=10, bulk_size=10):
     bulk_insert(db_name, docs)
   return True
 
-def remove_all_dbs():
+def remove_all_dbs(whitelist):
   url = '{base_url}/_all_dbs'.format(base_url=base_url)
   resp = requests.get(url, auth=auth, headers=headers)
   for db_name in resp.json():
     if db_name.startswith('_'):
+      log.info('Skipping system database {db_name}'.format(db_name=db_name))
+      continue
+    if db_name in whitelist:
+      log.info('Skipping whitelisted database {db_name}'.format(
+        db_name=db_name))
       continue
     url = '{base_url}/{db_name}'.format(base_url=base_url, db_name=db_name)
     resp = requests.delete(url, auth=auth, headers=headers)
@@ -147,7 +157,10 @@ def main():
 
   setup_client(cfg)
   if args.clear:
-    remove_all_dbs()
+    whitelist = [n.strip() for n in cfg.get('couchdb', 'whitelist').split(',')]
+    if args.whitelist is not None:
+      whitelist.extend(args.whitelist)
+    remove_all_dbs(whitelist)
   else:
     db_name = args.name if args.name is not None else fake.word()
     create_db(db_name)
