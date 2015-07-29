@@ -1,9 +1,22 @@
 {
-  "name": "name",
+  "name": {
+    "firstName": "first_name",
+    "lastName": "last_name"
+  },
   "age": {"attr" : "random_int", "args": [16, 106]},
   "email": "free_email",
   "phone": "phone_number",
   "street": "street_address",
   "state": "state",
-  "postcode": "postcode"
+  "postcode": "postcode",
+  "times": {
+    "createdAt": {
+      "attr": "date_time_between",
+      "args": ["-1y", "-1m"]
+    },
+    "updatedAt": {
+      "attr": "date_time_between",
+      "args": ["-1m", "now"]
+    }
+  }
 }
