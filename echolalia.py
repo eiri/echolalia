@@ -71,24 +71,30 @@ def create_db(db_name):
   log.info('Created database {db_name}'.format(db_name=db_name))
   return db_name
 
-def generate_doc(template):
-  doc = {}
-  for key, tpl in template.iteritems():
-    if isinstance(tpl, dict):
+def generate_value(tpl):
+  if isinstance(tpl, dict):
+    if 'attr' in tpl:
       attr = tpl['attr']
       args = tpl['args']
     else:
-      attr = tpl
-      args = ()
-    if hasattr(fake, attr):
-      fun = getattr(fake, attr)
-      value = fun(*args)
-    else:
-      value = tpl
-    if isinstance(value, (list,dict,str,unicode,int,float,bool,type(None))):
-      doc[key] = value
-    else:
-      doc[key] = str(value)
+      attr = generate_doc(tpl)
+  elif isinstance(tpl, list):
+    attr = [generate_value(value) for value in tpl]
+  else:
+    attr = tpl
+    args = ()
+  if isinstance(attr, basestring) and hasattr(fake, attr):
+    fun = getattr(fake, attr)
+    value = fun(*args)
+  else:
+    value = attr
+  if isinstance(value, (list,dict,str,unicode,int,float,bool,type(None))):
+    return value
+  else:
+    return str(value)
+
+def generate_doc(tpl):
+  doc = {key: generate_value(value) for key, value in tpl.iteritems()}
   log.debug('Generated doc {}'.format(pformat(doc)))
   return doc
 
@@ -153,7 +159,6 @@ def main():
     log.debug('Reading template {}'.format(template_file))
     with open(template_file) as tpl:
       template = json.load(tpl)
-      log.debug(pformat(template))
     create_docs(db_name, template=template, count=args.count)
 
   log.info('Done')
