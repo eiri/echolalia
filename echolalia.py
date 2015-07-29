@@ -157,7 +157,6 @@ def main():
     log.debug('Reading template {}'.format(template_file))
     with open(template_file) as tpl:
       template = json.load(tpl)
-      log.debug(pformat(template))
     create_docs(db_name, template=template, count=args.count)
 
   log.info('Done')
