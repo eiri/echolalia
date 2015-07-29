@@ -9,6 +9,7 @@
   "street": "street_address",
   "state": "state",
   "postcode": "postcode",
+  "tags": ["word", "day_of_week", "word", "word"],
   "times": {
     "createdAt": {
       "attr": "date_time_between",

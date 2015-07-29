@@ -78,6 +78,8 @@ def generate_value(tpl):
       args = tpl['args']
     else:
       attr = generate_doc(tpl)
+  elif isinstance(tpl, list):
+    attr = [generate_value(value) for value in tpl]
   else:
     attr = tpl
     args = ()
