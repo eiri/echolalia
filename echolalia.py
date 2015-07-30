@@ -12,26 +12,35 @@ from faker import Factory
 
 def parse_args():
   parser = argparse.ArgumentParser()
-  parser.add_argument('-d', '--debug', action='store_true')
-  parser.add_argument('--clear', action='store_true')
+  parser.add_argument('-v', '--verbose', action='store_true')
+  parser.add_argument('-l', '--log', type=str)
   parser.add_argument('--whitelist', type=str, action='append')
   parser.add_argument('-t', '--template', type=str, default='people')
   parser.add_argument('-c', '--count', type=int, default=10)
   parser.add_argument('-n', '--name', type=str)
+  parser.add_argument('--clear', action='store_true')
   return parser.parse_args()
 
-def init_logging(log_file, debug=True):
+def init_logging(log_file=None, verbose=False):
   requests_log = logging.getLogger('requests.packages.urllib3.connectionpool')
-  if debug:
+  if log_file is None:
+    if verbose:
+      level = logging.DEBUG
+      fmt = '%(levelname)-9s %(funcName)s:%(lineno)d - %(message)s'
+      requests_log.setLevel(level)
+    else:
+      level = logging.INFO
+      fmt = '%(asctime)s - %(message)s'
+      requests_log.disabled = True
     logging.basicConfig(
-      format='%(levelname)-9s %(funcName)s:%(lineno)d - %(message)s',
-      level=logging.DEBUG)
-    requests_log.setLevel(logging.DEBUG)
+      format=fmt,
+      datefmt='%H:%M:%S',
+      level=level)
   else:
     logging.basicConfig(
       format='%(asctime)s [%(levelname)s] - %(message)s',
       filename=log_file,
-      datefmt="%Y-%m-%d %H:%M:%S",
+      datefmt='%Y-%m-%d %H:%M:%S',
       level=logging.INFO)
     requests_log.disabled = True
   global log
@@ -166,9 +175,7 @@ def remove_all_dbs(whitelist):
 
 def main():
   args = parse_args()
-  script_name = os.path.splitext(os.path.basename(__file__))[0]
-  log_file = '{}.log'.format(script_name)
-  init_logging(log_file, args.debug)
+  init_logging(log_file=args.log, verbose=args.verbose)
   init_faker()
 
   config_file = 'config.ini'
