@@ -4,12 +4,27 @@
     "lastName": "last_name"
   },
   "age": {"attr" : "random_int", "args": [16, 106]},
+  "sex": {"attr" : "random_element", "args": [["M", "F"]]},
   "email": "free_email",
   "phone": "phone_number",
   "street": "street_address",
   "state": "state",
   "postcode": "postcode",
-  "tags": ["word", "day_of_week", "word", "word"],
+  "tags": [
+    "word",
+    {
+      "attr": "day_of_week",
+      "args": [],
+      "postprocess": [
+        "lower",
+        {
+          "attr": "encode",
+          "args": ["rot13"]
+        }
+      ]},
+    "word",
+    "word"
+  ],
   "times": {
     "createdAt": {
       "attr": "date_time_between",
