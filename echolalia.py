@@ -76,6 +76,15 @@ def create_db(db_name):
   log.info('Created database {db_name}'.format(db_name=db_name))
   return db_name
 
+def do_postprocess(value, pplist):
+  for pp in pplist:
+    if not hasattr(str, pp):
+      continue
+    value = str(value)
+    fun = getattr(str, pp)
+    value = fun(value)
+  return value
+
 def generate_value(tpl):
   if isinstance(tpl, dict):
     if 'attr' in tpl:
@@ -93,10 +102,14 @@ def generate_value(tpl):
     value = fun(*args)
   else:
     value = attr
-  if isinstance(value, (list,dict,str,unicode,int,float,bool,type(None))):
-    return value
-  else:
-    return str(value)
+  if not isinstance(value, (list,dict,str,unicode,int,float,bool,type(None))):
+    value = str(value)
+  if isinstance(tpl, dict) and 'postprocess' in tpl:
+    if isinstance(tpl['postprocess'], list):
+      value = do_postprocess(value, tpl['postprocess'])
+    else:
+      value = do_postprocess(value, [tpl['postprocess']])
+  return value
 
 def generate_doc(tpl):
   doc = {key: generate_value(value) for key, value in tpl.iteritems()}
