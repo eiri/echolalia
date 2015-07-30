@@ -51,7 +51,8 @@ def load_config(config_file):
   Config = ConfigParser.ConfigParser({
     'user' : None,
     'password' : '',
-    'whitelist': ''
+    'whitelist': '',
+    'bulk_size': '10'
   })
   Config.read(config_file)
   return Config
@@ -142,7 +143,7 @@ def bulk_insert(db_name, docs):
   log.info('Added {0:d} docs to database {db_name}'.format(len(docs),
     db_name=db_name))
 
-def create_docs(db_name, template={}, count=10, bulk_size=10):
+def create_docs(db_name, template, count, bulk_size):
   for _ in xrange(count / bulk_size):
     docs = []
     for _ in xrange(bulk_size):
@@ -199,7 +200,9 @@ def main():
     log.debug('Reading template {}'.format(template_file))
     with open(template_file) as tpl:
       template = json.load(tpl)
-    create_docs(db_name, template=template, count=args.count)
+    bulk_size = int(cfg.get('couchdb', 'bulk_size'))
+    create_docs(db_name, template=template, count=args.count,
+      bulk_size=bulk_size)
 
   log.info('Done')
   sys.exit(0)
