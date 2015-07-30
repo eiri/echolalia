@@ -3,6 +3,14 @@
     "firstName": "first_name",
     "lastName": "last_name"
   },
+  "ref": {
+    "attr": "random_int",
+    "args": [1,999],
+    "postprocess": {
+      "attr": "zfill",
+      "args": [5]
+    }
+  },
   "age": {"attr" : "random_int", "args": [16, 106]},
   "sex": {"attr" : "random_element", "args": [["M", "F"]]},
   "email": "free_email",

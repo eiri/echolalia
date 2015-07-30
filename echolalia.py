@@ -77,12 +77,19 @@ def create_db(db_name):
   return db_name
 
 def do_postprocess(value, pplist):
+  value = str(value)
   for pp in pplist:
-    if not hasattr(str, pp):
+    if isinstance(pp, dict):
+      attr = pp['attr']
+      args = [value]
+      args.extend(pp['args'])
+    else:
+      attr = pp
+      args = [value]
+    if not hasattr(str, attr):
       continue
-    value = str(value)
-    fun = getattr(str, pp)
-    value = fun(value)
+    fun = getattr(str, attr)
+    value = fun(*args)
   return value
 
 def generate_value(tpl):
