@@ -86,6 +86,33 @@ def create_db(db_name):
   log.info('Created database {db_name}'.format(db_name=db_name))
   return db_name
 
+def generate_value(tpl):
+  if isinstance(tpl, list):
+    value = [generate_value(value) for value in tpl]
+  elif 'attr' in tpl:
+    attr = tpl['attr']
+    args = tpl['args']
+    if not hasattr(fake, attr):
+      raise ValueError('Unknown fake method {}'.format(attr))
+    fun = getattr(fake, attr)
+    value = fun(*args)
+  else:
+    value = generate_doc(tpl)
+  value = normalize_to_json_type(value)
+  if isinstance(tpl, dict) and 'postprocess' in tpl:
+    value = do_postprocess(value, tpl['postprocess'])
+  return value
+
+def generate_doc(tpl):
+  doc = {key: generate_value(value) for key, value in tpl.iteritems()}
+  log.debug('Generated doc {}'.format(pformat(doc)))
+  return doc
+
+def normalize_to_json_type(value):
+  if not isinstance(value, (list,dict,str,unicode,int,float,bool,type(None))):
+    value = str(value)
+  return value
+
 def do_postprocess(value, pplist):
   value = str(value)
   for pp in pplist:
@@ -102,36 +129,23 @@ def do_postprocess(value, pplist):
     value = fun(*args)
   return value
 
-def generate_value(tpl):
-  if isinstance(tpl, dict):
+def preprocess_value(tpl):
+  if isinstance(tpl, basestring):
+    post_tpl = {'attr': tpl, 'args': ()}
+  elif isinstance(tpl, dict):
     if 'attr' in tpl:
-      attr = tpl['attr']
-      args = tpl['args']
+      if 'postprocess' in tpl and not isinstance(tpl['postprocess'], list):
+        tpl['postprocess'] = [tpl['postprocess']]
+      post_tpl = tpl
     else:
-      attr = generate_doc(tpl)
-  elif isinstance(tpl, list):
-    attr = [generate_value(value) for value in tpl]
+      post_tpl = preprocess_template(tpl)
   else:
-    attr = tpl
-    args = ()
-  if isinstance(attr, basestring) and hasattr(fake, attr):
-    fun = getattr(fake, attr)
-    value = fun(*args)
-  else:
-    value = attr
-  if not isinstance(value, (list,dict,str,unicode,int,float,bool,type(None))):
-    value = str(value)
-  if isinstance(tpl, dict) and 'postprocess' in tpl:
-    if isinstance(tpl['postprocess'], list):
-      value = do_postprocess(value, tpl['postprocess'])
-    else:
-      value = do_postprocess(value, [tpl['postprocess']])
-  return value
+    post_tpl = [preprocess_value(value) for value in tpl]
+  return post_tpl
 
-def generate_doc(tpl):
-  doc = {key: generate_value(value) for key, value in tpl.iteritems()}
-  log.debug('Generated doc {}'.format(pformat(doc)))
-  return doc
+def preprocess_template(tpl):
+  post_tpl = {key: preprocess_value(value) for key, value in tpl.iteritems()}
+  return post_tpl
 
 def bulk_insert(db_name, docs):
   url = '{base_url}/{db_name}/_bulk_docs'.format(base_url=base_url,
@@ -200,6 +214,7 @@ def main():
     log.debug('Reading template {}'.format(template_file))
     with open(template_file) as tpl:
       template = json.load(tpl)
+      template = preprocess_template(template)
     bulk_size = int(cfg.get('couchdb', 'bulk_size'))
     create_docs(db_name, template=template, count=args.count,
       bulk_size=bulk_size)
