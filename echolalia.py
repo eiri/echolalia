@@ -134,6 +134,8 @@ def preprocess_value(tpl):
     post_tpl = {'attr': tpl, 'args': ()}
   elif isinstance(tpl, dict):
     if 'attr' in tpl:
+      if not 'args' in tpl:
+        tpl['args'] = ()
       if 'postprocess' in tpl and not isinstance(tpl['postprocess'], list):
         tpl['postprocess'] = [tpl['postprocess']]
       post_tpl = tpl

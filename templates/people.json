@@ -9,12 +9,11 @@
   "phone": "phone_number",
   "street": "street_address",
   "state": "state",
-  "postcode": "postcode",
+  "postcode": {"attr": "postcode"},
   "tags": [
     "word",
     {
       "attr": "day_of_week",
-      "args": [],
       "postprocess": [
         "lower",
         {
