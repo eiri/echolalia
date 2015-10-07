@@ -91,14 +91,17 @@ def generate_value(tpl):
     value = [generate_value(value) for value in tpl]
   elif 'attr' in tpl:
     frmt = tpl['frmt']
-    attr = tpl['attr']
     args = tpl['args']
-    if not hasattr(fake, attr):
-      raise ValueError('Unknown fake method {}'.format(attr))
-    fun = getattr(fake, attr)
-    value = fun(*args)
-    if isinstance(value, (str,unicode)):
-      value = frmt.format(**{attr : value})
+    values = {}
+    for attr in tpl['attr']:
+      if not hasattr(fake, attr):
+        raise ValueError('Unknown fake method {}'.format(attr))
+      fun = getattr(fake, attr)
+      values[attr] = fun(*args)
+    if len(values) > 1 or isinstance(values.values()[0], (str, unicode)):
+      value = frmt.format(**values)
+    else:
+      value = values.values()[0]
   else:
     value = generate_doc(tpl)
   value = normalize_to_json_type(value)
@@ -134,11 +137,16 @@ def do_postprocess(value, pplist):
 
 def preprocess_value(tpl):
   if isinstance(tpl, basestring):
-    post_tpl = {'frmt': '{{{}}}'.format(tpl), 'attr': tpl, 'args': ()}
+    post_tpl = {'frmt': '{{{}}}'.format(tpl), 'attr': [tpl], 'args': ()}
   elif isinstance(tpl, dict):
     if 'attr' in tpl:
+      if not isinstance(tpl['attr'], list):
+        tpl['attr'] = [tpl['attr']]
       if not 'frmt' in tpl:
-        tpl['frmt'] = '{{{}}}'.format(tpl['attr'])
+        frmt = []
+        for attr in tpl['attr']:
+          frmt.append('{{{}}}'.format(attr))
+        tpl['frmt'] = " ".join(frmt)
       if not 'args' in tpl:
         tpl['args'] = ()
       if 'postprocess' in tpl and not isinstance(tpl['postprocess'], list):
