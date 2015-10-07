@@ -9,7 +9,7 @@
   "email": "free_email",
   "phone": "phone_number",
   "street": "street_address",
-  "state": "state",
+  "state": "{state}, {state_abbr}",
   "postcode": {
     "frmt": "ZIP: {postcode}",
     "attr": "postcode"
