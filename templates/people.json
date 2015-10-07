@@ -5,16 +5,19 @@
   },
   "age": {"attr" : "random_int", "args": [16, 106]},
   "sex": {"attr" : "random_element", "args": [["M", "F"]]},
+  "single": "boolean",
   "email": "free_email",
   "phone": "phone_number",
   "street": "street_address",
-  "state": "state",
-  "postcode": "postcode",
+  "state": "{state}, {state_abbr}",
+  "postcode": {
+    "frmt": "ZIP: {postcode}",
+    "attr": "postcode"
+  },
   "tags": [
     "word",
     {
       "attr": "day_of_week",
-      "args": [],
       "postprocess": [
         "lower",
         {

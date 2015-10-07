@@ -5,7 +5,7 @@
 Generate random data for your CouchDB
 """
 
-import sys, os, argparse, logging, ConfigParser, json
+import sys, os, re, argparse, logging, ConfigParser, json
 from pprint import pformat
 import requests
 from faker import Factory
@@ -90,12 +90,18 @@ def generate_value(tpl):
   if isinstance(tpl, list):
     value = [generate_value(value) for value in tpl]
   elif 'attr' in tpl:
-    attr = tpl['attr']
+    frmt = tpl['frmt']
     args = tpl['args']
-    if not hasattr(fake, attr):
-      raise ValueError('Unknown fake method {}'.format(attr))
-    fun = getattr(fake, attr)
-    value = fun(*args)
+    values = {}
+    for attr in tpl['attr']:
+      if not hasattr(fake, attr):
+        raise ValueError('Unknown fake method {}'.format(attr))
+      fun = getattr(fake, attr)
+      values[attr] = fun(*args)
+    if len(values) > 1 or isinstance(values.values()[0], (str, unicode)):
+      value = frmt.format(**values)
+    else:
+      value = values.values()[0]
   else:
     value = generate_doc(tpl)
   value = normalize_to_json_type(value)
@@ -129,11 +135,32 @@ def do_postprocess(value, pplist):
     value = fun(*args)
   return value
 
+def parse_attr(string):
+  attrs = re.findall(r'{(\w+)}', string)
+  if len(attrs) > 0:
+    return(string, attrs)
+  else:
+    return ('{{{}}}'.format(string), [string])
+
 def preprocess_value(tpl):
   if isinstance(tpl, basestring):
-    post_tpl = {'attr': tpl, 'args': ()}
+    (frmt, attr) = parse_attr(tpl)
+    post_tpl = {'frmt': frmt, 'attr': attr, 'args': ()}
   elif isinstance(tpl, dict):
     if 'attr' in tpl:
+      if not isinstance(tpl['attr'], list):
+        (frmt, attr) = parse_attr(tpl['attr'])
+        tpl['attr'] = attr
+        if not 'frmt' in tpl:
+          tpl['frmt'] = frmt
+      else:
+        if not 'frmt' in tpl:
+          frmt = []
+          for attr in tpl['attr']:
+            frmt.append('{{{}}}'.format(attr))
+          tpl['frmt'] = " ".join(frmt)
+      if not 'args' in tpl:
+        tpl['args'] = ()
       if 'postprocess' in tpl and not isinstance(tpl['postprocess'], list):
         tpl['postprocess'] = [tpl['postprocess']]
       post_tpl = tpl
