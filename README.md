@@ -1,5 +1,5 @@
-# echolalia
-Generate random data for your CouchDB
+# Echolalia
+Generate random data to test your application
 
 ## Installation
 
@@ -8,6 +8,7 @@ Clone repo with `git clone https://github.com/eiri/echolalia.git`, create and ac
 Now edit _config.ini_ and you all set to run
 
 ## Usage
+### With CouchDB
 
 Create new database with random name and 10 documents using template _people_. Those are all defaults.
 
@@ -31,7 +32,6 @@ $ curl http://localhost:5984/praesentium/_all_docs?include_docs=true -s | jq .ro
 "Shonda Ortiz"
 "Hudson Kohler"
 ```
-
 
 Create new database with name `access` and populate it with 53 documents using template _access_logs_
 
@@ -77,6 +77,8 @@ $ curl http://localhost:5984/_all_dbs -s | jq .
 ```
 
 ## Templating
+
+TBD
 
 ## Licence
 
