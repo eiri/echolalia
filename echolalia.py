@@ -2,13 +2,14 @@
 # coding: utf-8
 
 """
-Generate random data for your CouchDB
+Generate random data for your application
 """
 
-import sys, os, re, argparse, logging, ConfigParser, json
+import sys, argparse, logging, ConfigParser, json
 from pprint import pformat
 import requests
-from faker import Factory
+
+from echolalia.generator import Generator
 
 def parse_args():
   parser = argparse.ArgumentParser()
@@ -57,11 +58,6 @@ def load_config(config_file):
   Config.read(config_file)
   return Config
 
-def init_faker():
-  global fake
-  fake = Factory.create()
-  return True
-
 def setup_client(cfg):
   global base_url
   global auth
@@ -86,94 +82,6 @@ def create_db(db_name):
   log.info('Created database {db_name}'.format(db_name=db_name))
   return db_name
 
-def generate_value(tpl):
-  if isinstance(tpl, list):
-    value = [generate_value(value) for value in tpl]
-  elif 'attr' in tpl:
-    frmt = tpl['frmt']
-    args = tpl['args']
-    values = {}
-    for attr in tpl['attr']:
-      if not hasattr(fake, attr):
-        raise ValueError('Unknown fake method {}'.format(attr))
-      fun = getattr(fake, attr)
-      values[attr] = fun(*args)
-    if len(values) > 1 or isinstance(values.values()[0], (str, unicode)):
-      value = frmt.format(**values)
-    else:
-      value = values.values()[0]
-  else:
-    value = generate_doc(tpl)
-  value = normalize_to_json_type(value)
-  if isinstance(tpl, dict) and 'postprocess' in tpl:
-    value = do_postprocess(value, tpl['postprocess'])
-  return value
-
-def generate_doc(tpl):
-  doc = {key: generate_value(value) for key, value in tpl.iteritems()}
-  log.debug('Generated doc {}'.format(pformat(doc)))
-  return doc
-
-def normalize_to_json_type(value):
-  if not isinstance(value, (list,dict,str,unicode,int,float,bool,type(None))):
-    value = str(value)
-  return value
-
-def do_postprocess(value, pplist):
-  value = str(value)
-  for pp in pplist:
-    if isinstance(pp, dict):
-      attr = pp['attr']
-      args = [value]
-      args.extend(pp['args'])
-    else:
-      attr = pp
-      args = [value]
-    if not hasattr(str, attr):
-      continue
-    fun = getattr(str, attr)
-    value = fun(*args)
-  return value
-
-def parse_attr(string):
-  attrs = re.findall(r'{(\w+)}', string)
-  if len(attrs) > 0:
-    return(string, attrs)
-  else:
-    return ('{{{}}}'.format(string), [string])
-
-def preprocess_value(tpl):
-  if isinstance(tpl, basestring):
-    (frmt, attr) = parse_attr(tpl)
-    post_tpl = {'frmt': frmt, 'attr': attr, 'args': ()}
-  elif isinstance(tpl, dict):
-    if 'attr' in tpl:
-      if not isinstance(tpl['attr'], list):
-        (frmt, attr) = parse_attr(tpl['attr'])
-        tpl['attr'] = attr
-        if not 'frmt' in tpl:
-          tpl['frmt'] = frmt
-      else:
-        if not 'frmt' in tpl:
-          frmt = []
-          for attr in tpl['attr']:
-            frmt.append('{{{}}}'.format(attr))
-          tpl['frmt'] = " ".join(frmt)
-      if not 'args' in tpl:
-        tpl['args'] = ()
-      if 'postprocess' in tpl and not isinstance(tpl['postprocess'], list):
-        tpl['postprocess'] = [tpl['postprocess']]
-      post_tpl = tpl
-    else:
-      post_tpl = preprocess_template(tpl)
-  else:
-    post_tpl = [preprocess_value(value) for value in tpl]
-  return post_tpl
-
-def preprocess_template(tpl):
-  post_tpl = {key: preprocess_value(value) for key, value in tpl.iteritems()}
-  return post_tpl
-
 def bulk_insert(db_name, docs):
   url = '{base_url}/{db_name}/_bulk_docs'.format(base_url=base_url,
     db_name=db_name)
@@ -184,19 +92,12 @@ def bulk_insert(db_name, docs):
   log.info('Added {0:d} docs to database {db_name}'.format(len(docs),
     db_name=db_name))
 
-def create_docs(db_name, template, count, bulk_size):
-  for _ in xrange(count / bulk_size):
-    docs = []
-    for _ in xrange(bulk_size):
-      doc = generate_doc(template)
-      docs.append(doc)
-    bulk_insert(db_name, docs)
-  docs = []
-  for _ in xrange(count % bulk_size):
-    doc = generate_doc(template)
-    docs.append(doc)
-  if len(docs) > 0:
-    bulk_insert(db_name, docs)
+def create_docs(db_name, docs, bulk_size):
+  if bulk_size < 1:
+    raise ValueError('bulk_size has to exceed 0')
+  chunks = [docs[i:i + bulk_size] for i in range(0, len(docs), bulk_size)]
+  for chunk in chunks:
+    bulk_insert(db_name, chunk)
   return True
 
 def remove_all_dbs(whitelist):
@@ -218,33 +119,26 @@ def remove_all_dbs(whitelist):
 def main():
   args = parse_args()
   init_logging(log_file=args.log, verbose=args.verbose)
-  init_faker()
 
   config_file = 'config.ini'
   log.debug('Reading config {}'.format(config_file))
   cfg = load_config(config_file)
 
+  generator = Generator(args.template)
   setup_client(cfg)
+
   if args.clear:
     whitelist = [n.strip() for n in cfg.get('couchdb', 'whitelist').split(',')]
     if args.whitelist is not None:
       whitelist.extend(args.whitelist)
     remove_all_dbs(whitelist)
   else:
-    db_name = args.name if args.name is not None else fake.word()
+    db_name = args.name if args.name is not None else generator.word()
     create_db(db_name)
     log.info('Populating database with template {}'.format(args.template))
-    if os.path.isfile(args.template):
-      template_file = args.template
-    else:
-      template_file = 'templates/{}.json'.format(args.template)
-    log.debug('Reading template {}'.format(template_file))
-    with open(template_file) as tpl:
-      template = json.load(tpl)
-      template = preprocess_template(template)
     bulk_size = int(cfg.get('couchdb', 'bulk_size'))
-    create_docs(db_name, template=template, count=args.count,
-      bulk_size=bulk_size)
+    docs = [generator.doc() for _ in xrange(args.count)]
+    create_docs(db_name, docs, bulk_size=bulk_size)
 
   log.info('Done')
   sys.exit(0)
