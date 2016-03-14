@@ -7,7 +7,7 @@ class Generator:
     if template is None:
       raise ValueError('missing required argument "tempalte"')
     logging.basicConfig()
-    self.log = logging.getLogger('Generator')
+    self.log = logging.getLogger(__name__)
     self.fake = Factory.create()
     self.set_template(template)
     return None
