@@ -3,14 +3,29 @@ import logging, requests
 
 class Writer:
 
-  def __init__(self, cfg):
+  def __init__(self):
     logging.basicConfig()
     self.log = logging.getLogger(__name__)
     requests_logger_name = 'requests.packages.urllib3.connectionpool'
     requests_log = logging.getLogger(requests_logger_name)
     requests_log.disabled = True
+    return None
+
+  def add_args(self, parser):
+    parser.add_argument('--whitelist', type=str, action='append')
+    parser.add_argument('--name', type=str)
+    parser.add_argument('--clear', action='store_true')
+    return parser
+
+  def configure(self, cfg, args):
     if not cfg.has_section('couchdb'):
       cfg.add_section('couchdb')
+    for key, value in vars(args).iteritems():
+      if key is 'whitelist':
+        continue
+      if value is not None and not cfg.has_option('main', key):
+        cfg.set('couchdb', key, str(value))
+
     host = cfg.get('couchdb', 'host')
     port = cfg.getint('couchdb', 'port')
     self.base_url = 'http://{0:s}:{1:d}'.format(host, port)
@@ -21,20 +36,34 @@ class Writer:
       self.auth = (user, password)
     else:
       self.auth = ()
+
     if cfg.has_option('couchdb', 'whitelist'):
       whitelist = cfg.get('couchdb', 'whitelist')
-      self.whitelist = []
-      for n in whitelist.split(','):
-        self.whitelist.append(n.strip())
     else:
-      self.whitelist = []
+      whitelist = []
+    self.whitelist = []
+    for n in whitelist.split(','):
+      self.whitelist.append(n.strip())
+    if args.whitelist is not None:
+      self.whitelist.extend(args.whitelist)
+    cfg.set('couchdb', 'whitelist', ','.join(self.whitelist))
+
     if cfg.has_option('couchdb', 'bulk_size'):
       self.bulk_size = cfg.getint('couchdb', 'bulk_size')
       if self.bulk_size < 1:
         raise ValueError('bulk_size has to exceed 0')
     else:
+        cfg.set('couchdb', 'bulk_size', '10')
         self.bulk_size = 10
-    return None
+    return cfg
+
+  def do(self, cfg, docs):
+    if cfg.getboolean('couchdb', 'clear'):
+      self.remove_all_dbs()
+    else:
+      name = cfg.get('couchdb', 'name')
+      self.create_db(name)
+      self.create_docs(name, docs)
 
   def create_db(self, db_name):
     url = '{base_url}/{db_name}'.format(
@@ -80,12 +109,3 @@ class Writer:
       resp = requests.delete(url, auth=self.auth, headers=self.headers)
       if resp.status_code == requests.codes.ok:
         self.log.info('Deleted database {db_name}'.format(db_name=db_name))
-
-  def do(self, args, docs):
-    if args.clear:
-      if args.whitelist is not None:
-        self.whitelist.extend(args.whitelist)
-      self.remove_all_dbs()
-    else:
-      self.create_db(args.name)
-      self.create_docs(args.name, docs)
