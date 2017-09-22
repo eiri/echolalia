@@ -12,58 +12,42 @@ class Writer:
     return None
 
   def add_args(self, parser):
-    parser.add_argument('--whitelist', type=str, action='append')
+    parser.add_argument('--whitelist', type=str, action='append', default=[])
+    parser.add_argument('--host', type=str, default='localhost')
+    parser.add_argument('--port', type=int, default=5984)
     parser.add_argument('--name', type=str)
+    parser.add_argument('--user', type=str)
+    parser.add_argument('--password', type=str)
+    parser.add_argument('--bulk_size', type=int, default=10)
     parser.add_argument('--clear', action='store_true')
     return parser
 
-  def configure(self, cfg, args):
-    if not cfg.has_section('couchdb'):
-      cfg.add_section('couchdb')
-    for key, value in vars(args).iteritems():
-      if key is 'whitelist':
-        continue
-      if value is not None and not cfg.has_option('main', key):
-        cfg.set('couchdb', key, str(value))
-
-    host = cfg.get('couchdb', 'host')
-    port = cfg.getint('couchdb', 'port')
-    self.base_url = 'http://{0:s}:{1:d}'.format(host, port)
+  def configure(self, args):
+    self.base_url = 'http://{0:s}:{1:d}'.format(args.host, args.port)
     self.headers = {'content-type': 'application/json'}
-    if cfg.has_option('couchdb', 'user'):
-      user = cfg.get('couchdb', 'user')
-      password = cfg.get('couchdb', 'password')
+    if args.user:
+      user = args.user
+      password = args.password
       self.auth = (user, password)
     else:
       self.auth = ()
 
-    if cfg.has_option('couchdb', 'whitelist'):
-      whitelist = cfg.get('couchdb', 'whitelist')
-    else:
-      whitelist = []
     self.whitelist = []
-    for n in whitelist.split(','):
+    for n in args.whitelist:
       self.whitelist.append(n.strip())
     if args.whitelist is not None:
       self.whitelist.extend(args.whitelist)
-    cfg.set('couchdb', 'whitelist', ','.join(self.whitelist))
 
-    if cfg.has_option('couchdb', 'bulk_size'):
-      self.bulk_size = cfg.getint('couchdb', 'bulk_size')
-      if self.bulk_size < 1:
-        raise ValueError('bulk_size has to exceed 0')
-    else:
-        cfg.set('couchdb', 'bulk_size', '10')
-        self.bulk_size = 10
-    return cfg
+    self.bulk_size = args.bulk_size
+    return None
 
-  def do(self, cfg, docs):
-    if cfg.getboolean('couchdb', 'clear'):
+  def do(self, args, docs):
+    self.configure(args)
+    if args.clear:
       self.remove_all_dbs()
     else:
-      name = cfg.get('couchdb', 'name')
-      self.create_db(name)
-      self.create_docs(name, docs)
+      self.create_db(args.name)
+      self.create_docs(args.name, docs)
 
   def create_db(self, db_name):
     url = '{base_url}/{db_name}'.format(
