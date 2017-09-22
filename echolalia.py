@@ -54,7 +54,7 @@ def main():
     args.name = generator.word()
 
   log.debug('Writing with writer "{}"'.format(args.writer))
-  writer.do(args, docs)
+  writer.write(args, docs)
 
   log.debug('Done')
   sys.exit(0)

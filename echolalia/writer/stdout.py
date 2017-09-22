@@ -9,6 +9,6 @@ class Writer:
   def add_args(self, parser):
     return parser
 
-  def do(self, args, docs):
+  def write(self, args, docs):
     print(json.dumps(docs), file=sys.stdout)
 
