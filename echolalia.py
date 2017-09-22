@@ -91,10 +91,11 @@ def main():
   docs = [generator.doc() for _ in xrange(count)]
 
   # FIXME - *facepalm*
-  if args.name is None:
-    cfg.set('couchdb', 'name', generator.word())
-  else:
-    cfg.set('couchdb', 'name', args.name)
+  if args.writer is 'couchdb':
+    if args.name is None:
+      cfg.set('couchdb', 'name', generator.word())
+    else:
+      cfg.set('couchdb', 'name', args.name)
 
   writer.do(cfg, docs)
 
