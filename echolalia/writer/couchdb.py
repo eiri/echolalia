@@ -7,7 +7,7 @@ class Writer:
     parser.add_argument('--whitelist', type=str, action='append', default=[])
     parser.add_argument('--host', type=str, default='localhost')
     parser.add_argument('--port', type=int, default=5984)
-    parser.add_argument('--name', type=str)
+    parser.add_argument('--name', type=str, required=True)
     parser.add_argument('--user', type=str)
     parser.add_argument('--password', type=str)
     parser.add_argument('--bulk_size', type=int, default=10)

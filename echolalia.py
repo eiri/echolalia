@@ -49,10 +49,6 @@ def main():
   generator = Generator(template)
   docs = generator.generate(count)
 
-  # FIXME - *facepalm*
-  if args.writer == 'couchdb' and args.name is None:
-    args.name = generator.word()
-
   log.debug('Writing with writer "{}"'.format(args.writer))
   writer.write(args, docs)
 
