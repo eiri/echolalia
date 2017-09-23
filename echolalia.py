@@ -47,7 +47,7 @@ def main():
   count = args.count
   log.debug('Generating {} docs with template {}'.format(count, template))
   generator = Generator(template)
-  docs = [generator.doc() for _ in xrange(count)]
+  docs = generator.generate(count)
 
   # FIXME - *facepalm*
   if args.writer == 'couchdb' and args.name is None:

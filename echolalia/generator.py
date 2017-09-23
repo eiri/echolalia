@@ -3,6 +3,10 @@ from faker import Factory
 
 class Generator:
 
+  def generate(self, count):
+      return [self.doc() for _ in xrange(count)]
+
+
   def __init__(self, template):
     if template is None:
       raise ValueError('missing required argument "tempalte"')
