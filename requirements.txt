@@ -1,2 +1,2 @@
-requests==2.7.0
-fake-factory==0.5.2
+requests==2.18.4
+Faker==0.8.4

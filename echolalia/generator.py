@@ -3,10 +3,13 @@ from faker import Factory
 
 class Generator:
 
+  def generate(self, count):
+      return [self.doc() for _ in xrange(count)]
+
+
   def __init__(self, template):
     if template is None:
       raise ValueError('missing required argument "tempalte"')
-    logging.basicConfig()
     self.log = logging.getLogger(__name__)
     self.fake = Factory.create()
     self.set_template(template)
@@ -117,6 +120,3 @@ class Generator:
     if tpl is None:
       self.log.debug('Generated doc {}'.format(doc))
     return doc
-
-  def word(self):
-    return self.fake.word()
