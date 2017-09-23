@@ -5,7 +5,7 @@
 Generate random data for your application
 """
 
-import os, sys, argparse, logging, importlib
+import argparse, logging, importlib
 from echolalia.generator import Generator
 
 def add_args(add_help=True):
@@ -53,7 +53,7 @@ def main():
   writer.write(args, docs)
 
   log.debug('Done')
-  sys.exit(0)
+  parser.exit(status=0)
 
 if __name__ == '__main__':
   main()
