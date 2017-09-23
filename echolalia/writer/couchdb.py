@@ -24,7 +24,6 @@ class Writer:
 
 
   def __init__(self):
-    logging.basicConfig()
     self.log = logging.getLogger(__name__)
     requests_logger_name = 'requests.packages.urllib3.connectionpool'
     requests_log = logging.getLogger(requests_logger_name)
