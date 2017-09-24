@@ -1,5 +1,5 @@
 from __future__ import print_function
-import json, sys
+import sys
 
 class Writer:
 
@@ -10,5 +10,5 @@ class Writer:
     return parser
 
   def write(self, args, docs):
-    print(json.dumps(docs), file=sys.stdout)
+    print(docs, file=sys.stdout)
 

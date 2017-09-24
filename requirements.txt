@@ -1,2 +1,11 @@
-requests==2.18.4
+certifi==2017.7.27.1
+chardet==3.0.4
 Faker==0.8.4
+idna==2.6
+ipaddress==1.0.18
+lazyxml==1.2.1
+python-dateutil==2.6.1
+PyYAML==3.12
+requests==2.18.4
+six==1.11.0
+urllib3==1.22
