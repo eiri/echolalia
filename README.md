@@ -3,7 +3,7 @@ Generate random data to test your application
 
 ## Installation
 
-Clone repo with `git clone https://github.com/eiri/echolalia.git`, create and active virtual environment with `virtualenv venv` and  `source venv/bin/activate`, then install requirements with `pip install -r requirements.txt`.
+Clone repo with `git clone https://github.com/eiri/echolalia-prototype.git`, create and active virtual environment with `virtualenv venv` and  `source venv/bin/activate`, then install requirements with `pip install -r requirements.txt`.
 
 
 ## Usage
