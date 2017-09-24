@@ -26,6 +26,8 @@ class Writer:
     return None
 
   def __configure__(self, args):
+    if args.format != 'raw':
+      raise ValueError('Only accept format is "raw"')
     self.base_url = 'http://{0:s}:{1:d}'.format(args.host, args.port)
     self.headers = {'content-type': 'application/json'}
     if args.user:
@@ -43,13 +45,13 @@ class Writer:
     resp = requests.put(url, auth=self.auth, headers=self.headers)
     if resp.status_code != 201:
       raise ValueError(resp.json())
-    self.log.info('Created database {db_name}'.format(db_name=db_name))
+    self.log.debug('Created database {db_name}'.format(db_name=db_name))
     return db_name
 
   def __create_docs__(self, db_name, docs):
     size = self.bulk_size
     chunks = [docs[i:i + size] for i in range(0, len(docs), size)]
-    self.log.info('Populating database {db}'.format(db=db_name))
+    self.log.debug('Populating database {db}'.format(db=db_name))
     for chunk in chunks:
       self.__bulk_insert__(db_name, chunk)
     return True

@@ -8,12 +8,12 @@ Generate random data for your application
 import argparse, logging, importlib
 from echolalia.generator import Generator
 
-def add_args(add_help=True):
+def add_args():
   parser = argparse.ArgumentParser(
-    description='Generate random data for your application',
-    add_help=add_help)
+    description='Generate random data for your application')
   parser.add_argument('-w', '--writer', type=str, default='stdout')
   parser.add_argument('-t', '--template', type=str, required=True)
+  parser.add_argument('-f', '--format', type=str, default='json')
   parser.add_argument('-c', '--count', type=int, default=1)
   parser.add_argument('-v', '--verbose', action='store_true')
   return parser
@@ -30,14 +30,19 @@ def init_logging(verbose=False):
   return logging.getLogger()
 
 def main():
-  pre_parser = add_args(add_help=False)
-  (pre_args, _) = pre_parser.parse_known_args()
-
-
-  mod = importlib.import_module('echolalia.writer.{}'.format(pre_args.writer))
-  writer = mod.Writer()
   parser = add_args()
+  (args, _) = parser.parse_known_args()
+
+  writer = args.writer
+  formatter = args.format
+
+  mod = importlib.import_module('echolalia.writer.{}'.format(writer))
+  writer = mod.Writer()
   parser = writer.add_args(parser)
+
+  mod = importlib.import_module('echolalia.formatter.{}er'.format(formatter))
+  formatter = mod.Formatter()
+  parser = formatter.add_args(parser)
   args = parser.parse_args()
 
   log = init_logging(verbose=args.verbose)
@@ -47,7 +52,10 @@ def main():
   count = args.count
   log.debug('Generating {} docs with template {}'.format(count, template))
   generator = Generator(template)
-  docs = generator.generate(count)
+  data = generator.generate(count)
+
+  log.debug('Marshalling with formatter "{}"'.format(args.format))
+  docs = formatter.marshall(args, data)
 
   log.debug('Writing with writer "{}"'.format(args.writer))
   writer.write(args, docs)

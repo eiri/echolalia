@@ -37,8 +37,8 @@ DEBUG     doc:121 - Generated doc {u'name': {u'lastName': 'Martinez', u'firstNam
 DEBUG     main:52 - Writing with writer "couchdb"
 DEBUG     _new_conn:208 - Starting new HTTP connection (1): localhost
 DEBUG     _make_request:396 - http://localhost:5984 "PUT /tori HTTP/1.1" 201 12
-INFO      __create_db__:58 - Created database tori
-INFO      __create_docs__:64 - Populating database tori
+DEBUG      __create_db__:58 - Created database tori
+DEBUG      __create_docs__:64 - Populating database tori
 DEBUG     _new_conn:208 - Starting new HTTP connection (1): localhost
 DEBUG     _make_request:396 - http://localhost:5984 "POST /tori/_bulk_docs HTTP/1.1" 201 192
 DEBUG     __bulk_insert__:95 - Added 2 docs to database tori
