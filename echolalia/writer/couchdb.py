@@ -13,9 +13,9 @@ class Writer:
     return parser
 
   def write(self, args, docs):
-    self.__configure__(args)
-    self.__create_db__(args.name)
-    self.__create_docs__(args.name, docs)
+    self._configure(args)
+    self._create_db(args.name)
+    self._create_docs(args.name, docs)
 
 
   def __init__(self):
@@ -25,7 +25,7 @@ class Writer:
     requests_log.disabled = True
     return None
 
-  def __configure__(self, args):
+  def _configure(self, args):
     if args.format != 'raw':
       raise ValueError('Only accept format is "raw"')
     self.base_url = 'http://{0:s}:{1:d}'.format(args.host, args.port)
@@ -39,7 +39,7 @@ class Writer:
     self.bulk_size = args.bulk_size
     return None
 
-  def __create_db__(self, db_name):
+  def _create_db(self, db_name):
     url = '{base_url}/{db_name}'.format(
       base_url=self.base_url, db_name=db_name)
     resp = requests.put(url, auth=self.auth, headers=self.headers)
@@ -48,15 +48,15 @@ class Writer:
     self.log.debug('Created database {db_name}'.format(db_name=db_name))
     return db_name
 
-  def __create_docs__(self, db_name, docs):
+  def _create_docs(self, db_name, docs):
     size = self.bulk_size
     chunks = [docs[i:i + size] for i in range(0, len(docs), size)]
     self.log.debug('Populating database {db}'.format(db=db_name))
     for chunk in chunks:
-      self.__bulk_insert__(db_name, chunk)
+      self._bulk_insert(db_name, chunk)
     return True
 
-  def __bulk_insert__(self, db_name, docs):
+  def _bulk_insert(self, db_name, docs):
     url = '{base_url}/{db_name}/_bulk_docs'.format(
       base_url=self.base_url, db_name=db_name)
     resp = requests.post(url, auth=self.auth, headers=self.headers,
