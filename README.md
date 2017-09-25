@@ -28,30 +28,31 @@ This is a basic plugin that just outputs generated data on standard output.
 This plugin creates new database with given name, than using passed in data to propogate it.
 
 ```bash
-$ ./echolalia.py -c 2 -t templates/people.json -w couchdb --name tori -v
-DEBUG     main:44 - Start
-DEBUG     main:48 - Generating 2 docs with template templates/people.json
+$ ./echolalia.py -c 2 -t templates/people.json -f raw -w couchdb --name tori -v
+DEBUG     main:49 - Start
+DEBUG     main:53 - Generating 2 docs with template templates/people.json
 DEBUG     set_template:85 - Reading template templates/people.json
-DEBUG     doc:121 - Generated doc {u'name': {u'lastName': 'Williams', u'firstName': 'Deanna'}, u'tags': ['facilis', 'sevqnl', 'sit', 'inventore'], u'age': 74, u'state': u'North Dakota, ND', u'sex': 'M', u'phone': '08582618909', u'single': True, u'street': '007 Sarah Walks', u'postcode': u'ZIP: 44204', u'times': {u'createdAt': '2016-12-28 23:54:19', u'updatedAt': '2017-09-23 15:39:20'}, u'email': 'timothylynch@hotmail.com'}
-DEBUG     doc:121 - Generated doc {u'name': {u'lastName': 'Martinez', u'firstName': 'Jermaine'}, u'tags': ['laborum', 'jrqarfqnl', 'iure', 'tenetur'], u'age': 77, u'state': u'Alaska, SD', u'sex': 'M', u'phone': '06400668895', u'single': True, u'street': '24396 Joshua Vista Suite 529', u'postcode': u'ZIP: 15229-1795', u'times': {u'createdAt': '2017-06-13 08:42:26', u'updatedAt': '2017-09-23 15:39:42'}, u'email': 'aguilartracey@gmail.com'}
-DEBUG     main:52 - Writing with writer "couchdb"
+DEBUG     doc:121 - Generated doc {u'name': {u'lastName': 'Sanchez', u'firstName': 'Mary'}, u'tags': ['quas', 'ghrfqnl', 'iusto', 'molestiae'], u'age': 105, u'state': u'New Mexico, CT', u'sex': 'F', u'phone': '916-771-1436x8689', u'single': True, u'street': '5635 Holly Wells Suite 442', u'postcode': u'ZIP: 34574', u'times': {u'createdAt': '2017-07-17 21:37:27', u'updatedAt': '2017-09-25 08:49:10'}, u'email': 'dmorgan@gmail.com'}
+DEBUG     doc:121 - Generated doc {u'name': {u'lastName': 'Miller', u'firstName': 'Jennifer'}, u'tags': ['sit', 'fngheqnl', 'suscipit', 'illum'], u'age': 16, u'state': u'Maine, PW', u'sex': 'F', u'phone': '1-099-592-1502', u'single': False, u'street': '643 Heather Trail', u'postcode': u'ZIP: 06884', u'times': {u'createdAt': '2017-09-23 10:01:20', u'updatedAt': '2017-09-25 08:50:00'}, u'email': 'gbraun@yahoo.com'}
+DEBUG     main:57 - Marshalling with formatter "raw"
+DEBUG     main:60 - Writing with writer "couchdb"
 DEBUG     _new_conn:208 - Starting new HTTP connection (1): localhost
 DEBUG     _make_request:396 - http://localhost:5984 "PUT /tori HTTP/1.1" 201 12
-DEBUG      __create_db__:58 - Created database tori
-DEBUG      __create_docs__:64 - Populating database tori
+DEBUG     _create_db:48 - Created database tori
+DEBUG     _create_docs:54 - Populating database tori
 DEBUG     _new_conn:208 - Starting new HTTP connection (1): localhost
 DEBUG     _make_request:396 - http://localhost:5984 "POST /tori/_bulk_docs HTTP/1.1" 201 192
-DEBUG     __bulk_insert__:95 - Added 2 docs to database tori
-DEBUG     main:55 - Done
+DEBUG     _bulk_insert:67 - Added 2 docs to database tori
+DEBUG     main:63 - Done
 
 $ curl http://localhost:5984/tori/_all_docs?include_docs=true -s | jq .rows[].doc.name
 {
-  "lastName": "Williams",
-  "firstName": "Deanna"
+  "lastName": "Sanchez",
+  "firstName": "Mary"
 }
 {
-  "lastName": "Martinez",
-  "firstName": "Jermaine"
+  "lastName": "Miller",
+  "firstName": "Jennifer"
 }
 ```
 
