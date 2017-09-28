@@ -16,7 +16,7 @@ class StdoutTestCase(unittest.TestCase):
     try:
       output = StringIO.StringIO()
       sys.stdout = output
-      args = self.parser.parse_args()
+      args = self.parser.parse_args([])
       self.writer.write(args, self.data)
       self.assertEqual(output.getvalue(), "{}\n".format(self.data))
       output.close()
