@@ -12,10 +12,12 @@ def add_args():
   parser = argparse.ArgumentParser(
     description='Generate random data for your application')
   parser.add_argument('-w', '--writer', type=str, default='stdout')
-  parser.add_argument('-t', '--template', type=str, required=True)
   parser.add_argument('-f', '--format', type=str, default='json')
   parser.add_argument('-c', '--count', type=int, default=1)
   parser.add_argument('-v', '--verbose', action='store_true')
+  group = parser.add_mutually_exclusive_group(required=True)
+  group.add_argument('-t', '--template', type=str)
+  group.add_argument('-i', '--items', type=str, action='append', metavar='KEY=VALUE')
   return parser
 
 def init_logging(verbose=False):
@@ -50,8 +52,19 @@ def main():
 
   template = args.template
   count = args.count
-  log.debug('Generating {} docs with template {}'.format(count, template))
-  generator = Generator(template)
+  if template is None:
+    log.debug('Generating {} docs with {} item(s)'.format(count, len(args.items)))
+    items = {}
+    for item in args.items:
+      kv = item.split("=", 1)
+      if len(kv) == 2:
+        items[kv[0]] = kv[1]
+      else:
+        items[item] = item
+    generator = Generator(items=items)
+  else:
+    log.debug('Generating {} docs with template {}'.format(count, template))
+    generator = Generator(template=template)
   data = generator.generate(count)
 
   log.debug('Marshalling with formatter "{}"'.format(args.format))
