@@ -7,11 +7,15 @@ class Generator:
       return [self.doc() for _ in xrange(count)]
 
 
-  def __init__(self, template):
-    if template is None:
-      raise ValueError('missing required argument "tempalte"')
+  def __init__(self, template=None, items=None):
+    if template is None and items is None:
+      raise ValueError('missing required arguments "template" or "items"')
     self.log = logging.getLogger(__name__)
     self.fake = Factory.create()
+    if template is None:
+      template = self.create_template(items)
+    else:
+      template = self.read_template(template)
     self.set_template(template)
     return None
 
@@ -78,15 +82,26 @@ class Generator:
     return post_tpl
 
   def set_template(self, template):
+    self.template = self.preprocess_template(template)
+    return True
+
+  def read_template(self, template):
     if os.path.isfile(template):
       template_file = template
     else:
+      raise ValueError("Can't find template file {}".format(template))
       template_file = 'templates/{}.json'.format(template)
     self.log.debug('Reading template {}'.format(template_file))
     with open(template_file) as tpl:
       template = json.load(tpl)
-      self.template = self.preprocess_template(template)
-    return True
+    return template
+
+  def create_template(self, items):
+    template = {}
+    self.log.debug('Creating template for {} item(s)'.format(len(items)))
+    for item in items:
+      template[item] = item
+    return template
 
   def generate_value(self, tpl):
     if isinstance(tpl, list):

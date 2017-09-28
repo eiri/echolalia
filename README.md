@@ -13,7 +13,14 @@ $ ./echolalia.py -c 2 -t templates/people.json -w stdout
 [{"name": {"lastName": "Shannon", "firstName": "Rhonda"}, "tags": ["nihil", "fngheqnl", "impedit", "consequatur"], "age": 30, "state": "Hawaii, AR", "sex": "F", "phone": "03744269231", "single": true, "street": "4081 Sharon Ranch Apt. 197", "postcode": "ZIP: 02709-0053", "times": {"createdAt": "2017-02-13 13:14:08", "updatedAt": "2017-09-23 15:37:29"}, "email": "tiffany87@hotmail.com"}, {"name": {"lastName": "Hanson", "firstName": "Robert"}, "tags": ["quasi", "zbaqnl", "deserunt", "laborum"], "age": 104, "state": "Nevada, FL", "sex": "F", "phone": "(698)292-8761x6944", "single": false, "street": "3898 Alexandria Parkways", "postcode": "ZIP: 24439", "times": {"createdAt": "2017-05-03 03:16:21", "updatedAt": "2017-09-23 15:37:02"}, "email": "zfowler@hotmail.com"}]
 ```
 
-## Teplates
+```bash
+$ ./echolalia.py -c 2 -i name -i email=free_email -f csv
+Bruce Day,lori09@yahoo.com
+Janice Turner,matthew72@sanders.com
+
+```
+
+## Templates
 _TBD_
 
 ## Formatters
@@ -21,7 +28,10 @@ _TBD_
 
 ## Writers
 ### StdOut
-This is a basic plugin that just outputs generated data on standard output.
+This is a basic plugin that just outputs generated data on the standard output.
+
+### File
+Output to a specified with `-o` or `--output` file.
 
 ### CouchDB
 
