@@ -1,4 +1,7 @@
 # Echolalia
+
+![project: prototype](https://img.shields.io/badge/project-prototype-orange.svg "Project: Prototype")
+
 Generate random data to test your application
 
 ## Installation
