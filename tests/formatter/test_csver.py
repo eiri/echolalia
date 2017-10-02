@@ -21,6 +21,7 @@ class CsverTestCase(unittest.TestCase):
     args = new_parser.parse_args([])
     result = self.formatter.marshall(args, self.data)
     expect = "a,1\r\nb,2\r\nc,3\r\n"
+    self.assertEqual(result, expect)
 
   def test_marshall_with_header(self):
     new_parser = self.formatter.add_args(self.parser)
