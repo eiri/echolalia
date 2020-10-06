@@ -1,7 +1,6 @@
 # Echolalia
 
 ![project: prototype](https://img.shields.io/badge/project-prototype-orange.svg "Project: Prototype")
-[![Build Status](https://travis-ci.org/eiri/echolalia-prototype.svg?branch=master)](https://travis-ci.org/eiri/echolalia-prototype)
 
 Generate random data to test your application
 
