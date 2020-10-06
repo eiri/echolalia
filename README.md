@@ -1,7 +1,6 @@
 # Echolalia
 
 ![project: prototype](https://img.shields.io/badge/project-prototype-orange.svg "Project: Prototype")
-[![Build Status](https://travis-ci.org/eiri/echolalia-prototype.svg?branch=master)](https://travis-ci.org/eiri/echolalia-prototype)
 
 Generate random data to test your application
 
@@ -54,39 +53,6 @@ This is a basic plugin that just outputs generated data on the standard output.
 
 ### File
 Output to a specified with `-o` or `--output` file.
-
-### CouchDB
-
-This plugin creates new database with given name, than using passed in data to propogate it.
-
-```bash
-$ ./echolalia.py -c 2 -t templates/people.json -f raw -w couchdb --name tori -v
-DEBUG     main:49 - Start
-DEBUG     main:53 - Generating 2 docs with template templates/people.json
-DEBUG     set_template:85 - Reading template templates/people.json
-DEBUG     doc:121 - Generated doc {u'name': {u'lastName': 'Sanchez', u'firstName': 'Mary'}, u'tags': ['quas', 'ghrfqnl', 'iusto', 'molestiae'], u'age': 105, u'state': u'New Mexico, CT', u'sex': 'F', u'phone': '916-771-1436x8689', u'single': True, u'street': '5635 Holly Wells Suite 442', u'postcode': u'ZIP: 34574', u'times': {u'createdAt': '2017-07-17 21:37:27', u'updatedAt': '2017-09-25 08:49:10'}, u'email': 'dmorgan@gmail.com'}
-DEBUG     doc:121 - Generated doc {u'name': {u'lastName': 'Miller', u'firstName': 'Jennifer'}, u'tags': ['sit', 'fngheqnl', 'suscipit', 'illum'], u'age': 16, u'state': u'Maine, PW', u'sex': 'F', u'phone': '1-099-592-1502', u'single': False, u'street': '643 Heather Trail', u'postcode': u'ZIP: 06884', u'times': {u'createdAt': '2017-09-23 10:01:20', u'updatedAt': '2017-09-25 08:50:00'}, u'email': 'gbraun@yahoo.com'}
-DEBUG     main:57 - Marshalling with formatter "raw"
-DEBUG     main:60 - Writing with writer "couchdb"
-DEBUG     _new_conn:208 - Starting new HTTP connection (1): localhost
-DEBUG     _make_request:396 - http://localhost:5984 "PUT /tori HTTP/1.1" 201 12
-DEBUG     _create_db:48 - Created database tori
-DEBUG     _create_docs:54 - Populating database tori
-DEBUG     _new_conn:208 - Starting new HTTP connection (1): localhost
-DEBUG     _make_request:396 - http://localhost:5984 "POST /tori/_bulk_docs HTTP/1.1" 201 192
-DEBUG     _bulk_insert:67 - Added 2 docs to database tori
-DEBUG     main:63 - Done
-
-$ curl http://localhost:5984/tori/_all_docs?include_docs=true -s | jq .rows[].doc.name
-{
-  "lastName": "Sanchez",
-  "firstName": "Mary"
-}
-{
-  "lastName": "Miller",
-  "firstName": "Jennifer"
-}
-```
 
 ## Licence
 
