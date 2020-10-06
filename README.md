@@ -1,6 +1,7 @@
 # Echolalia
 
 ![project: prototype](https://img.shields.io/badge/project-prototype-orange.svg "Project: Prototype")
+![test](https://github.com/eiri/echolalia/workflows/test/badge.svg)
 
 Generate random data to test your application
 
