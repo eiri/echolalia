@@ -21,8 +21,8 @@
       "postprocess": [
         "lower",
         {
-          "attr": "encode",
-          "args": ["rot13"]
+          "attr": "center",
+          "args": [12, "#"]
         }
       ]},
     "word",

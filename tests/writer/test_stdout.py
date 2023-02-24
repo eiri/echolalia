@@ -1,11 +1,11 @@
-import unittest, argparse, sys, StringIO
+import unittest, argparse, sys, io
 from echolalia.writer.stdout import Writer
 
 class StdoutTestCase(unittest.TestCase):
 
   def setUp(self):
     self.parser = argparse.ArgumentParser()
-    self.data = [{chr(i): i - 96} for i in xrange(97, 123)]
+    self.data = [{chr(i): i - 96} for i in range(97, 123)]
     self.writer = Writer()
 
   def test_add_args(self):
@@ -14,7 +14,7 @@ class StdoutTestCase(unittest.TestCase):
   def test_write(self):
     saved_stdout = sys.stdout
     try:
-      output = StringIO.StringIO()
+      output = io.StringIO()
       sys.stdout = output
       args = self.parser.parse_args([])
       self.writer.write(args, self.data)

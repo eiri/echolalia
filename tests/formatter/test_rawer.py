@@ -5,7 +5,7 @@ class RawerTestCase(unittest.TestCase):
 
   def setUp(self):
     self.parser = argparse.ArgumentParser()
-    self.data = [{'char': chr(i), 'order': i - 96} for i in xrange(97, 100)]
+    self.data = [{'char': chr(i), 'order': i - 96} for i in range(97, 100)]
     self.formatter = Formatter()
 
   def test_add_args(self):

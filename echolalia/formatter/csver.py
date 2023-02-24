@@ -10,11 +10,11 @@ class Formatter:
     return parser
 
   def marshall(self, args, data):
-    output = io.BytesIO()
+    output = io.StringIO()
     keys = data[0].keys()
     writer = csv.DictWriter(output, fieldnames=keys)
     if args.with_header:
-        writer.writeheader()
+      writer.writeheader()
     for doc in data:
-        writer.writerow(doc)
+      writer.writerow(doc)
     return output.getvalue()
