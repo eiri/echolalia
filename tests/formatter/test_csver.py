@@ -5,7 +5,7 @@ class CsverTestCase(unittest.TestCase):
 
   def setUp(self):
     self.parser = argparse.ArgumentParser()
-    self.data = [{'char': chr(i), 'order': i - 96} for i in xrange(97, 100)]
+    self.data = [{'char': chr(i), 'order': i - 96} for i in range(97, 100)]
     self.formatter = Formatter()
 
   def test_add_args(self):
@@ -14,7 +14,7 @@ class CsverTestCase(unittest.TestCase):
     args = new_parser.parse_args(['--with_header'])
     self.assertTrue(args.with_header)
     args = new_parser.parse_args([])
-    self.assertFalse(args.with_header)      
+    self.assertFalse(args.with_header)
 
   def test_marshall_no_header(self):
     new_parser = self.formatter.add_args(self.parser)

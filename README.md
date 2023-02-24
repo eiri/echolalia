@@ -7,14 +7,13 @@ Generate random data to test your application
 
 ## Installation
 
-Clone repo with `git clone https://github.com/eiri/echolalia-prototype.git`, create and active virtual environment with `virtualenv venv` and  `source venv/bin/activate`, then install requirements with `pip install -r requirements.txt`.
-
+Clone repo with `git clone https://github.com/eiri/echolalia-prototype.git`, create and active virtual environment with `python -m venv venv` and  `. venv/bin/activate`, then install requirements with `pip install -r requirements.txt`.
 
 ## Usage
 
 ```bash
 $ ./echolalia.py -c 2 -t templates/people.json -w stdout
-[{"name": {"lastName": "Shannon", "firstName": "Rhonda"}, "tags": ["nihil", "fngheqnl", "impedit", "consequatur"], "age": 30, "state": "Hawaii, AR", "sex": "F", "phone": "03744269231", "single": true, "street": "4081 Sharon Ranch Apt. 197", "postcode": "ZIP: 02709-0053", "times": {"createdAt": "2017-02-13 13:14:08", "updatedAt": "2017-09-23 15:37:29"}, "email": "tiffany87@hotmail.com"}, {"name": {"lastName": "Hanson", "firstName": "Robert"}, "tags": ["quasi", "zbaqnl", "deserunt", "laborum"], "age": 104, "state": "Nevada, FL", "sex": "F", "phone": "(698)292-8761x6944", "single": false, "street": "3898 Alexandria Parkways", "postcode": "ZIP: 24439", "times": {"createdAt": "2017-05-03 03:16:21", "updatedAt": "2017-09-23 15:37:02"}, "email": "zfowler@hotmail.com"}]
+[{"name": {"lastName": "Shannon", "firstName": "Rhonda"}, "tags": ["nihil", "fngheqnl", "impedit", "consequatur"], "age": 30, "state": "Hawaii, AR", "sex": "F", "phone": "03744269231", "single": true, "street": "4081 Sharon Ranch Apt. 197", "postcode": "ZIP: 02709-0053", "times": {"createdAt": "2017-02-13 13:14:08", "updatedAt": "2017-09-23 15:37:29"}, "email": "tiffany87@hotmail.com"}, {"name": {"lastName": "Hanson", "firstName": "Robert"}, "tags": ["quasi", "##tuesday###", "deserunt", "laborum"], "age": 104, "state": "Nevada, FL", "sex": "F", "phone": "(698)292-8761x6944", "single": false, "street": "3898 Alexandria Parkways", "postcode": "ZIP: 24439", "times": {"createdAt": "2017-05-03 03:16:21", "updatedAt": "2017-09-23 15:37:02"}, "email": "zfowler@hotmail.com"}]
 ```
 
 ```bash
@@ -44,9 +43,6 @@ Marshalls data to CSV format. If command line argument `--with_headers` provided
 
 ### YAML
 Marshalls data in YAML. Collections always serialized in block style.
-
-### XML
-Marshalls data in XML. If command line argument `--root <ROOT>` provided, each document will be wraped in specified root element. Default root element `<document>`.
 
 ## Writers
 ### StdOut

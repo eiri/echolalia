@@ -5,7 +5,7 @@ class FileTestCase(unittest.TestCase):
 
   def setUp(self):
     self.parser = argparse.ArgumentParser()
-    self.data = [{chr(i): i - 96} for i in xrange(97, 123)]
+    self.data = [{chr(i): i - 96} for i in range(97, 123)]
     self.writer = Writer()
 
   def test_add_args(self):

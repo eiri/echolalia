@@ -4,7 +4,7 @@ from faker import Factory
 class Generator:
 
   def generate(self, count):
-      return [self.doc() for _ in xrange(count)]
+      return [self.doc() for _ in range(count)]
 
 
   def __init__(self, template=None, items=None):
@@ -20,7 +20,7 @@ class Generator:
     return None
 
   def normalize_to_json_type(self, value):
-    known_types = (list, dict, str, unicode, int, float, bool, type(None))
+    known_types = (list, dict, str, int, float, bool, type(None))
     if not isinstance(value, known_types):
       value = str(value)
     return value
@@ -49,7 +49,7 @@ class Generator:
       return ('{{{}}}'.format(string), [string])
 
   def preprocess_value(self, tpl):
-    if isinstance(tpl, basestring):
+    if isinstance(tpl, str):
       (frmt, attr) = self.parse_attr(tpl)
       post_tpl = {'frmt': frmt, 'attr': attr, 'args': ()}
     elif isinstance(tpl, dict):
@@ -77,7 +77,7 @@ class Generator:
     return post_tpl
 
   def preprocess_template(self, tpl):
-    items = tpl.iteritems()
+    items = tpl.items()
     post_tpl = {key: self.preprocess_value(value) for key, value in items}
     return post_tpl
 
@@ -115,10 +115,11 @@ class Generator:
           raise ValueError('Unknown fake method {}'.format(attr))
         fun = getattr(self.fake, attr)
         values[attr] = fun(*args)
-      if len(values) > 1 or isinstance(values.values()[0], (str, unicode)):
+      first_value = list(values.values())[0]
+      if len(values) > 1 or isinstance(first_value, str):
         value = frmt.format(**values)
       else:
-        value = values.values()[0]
+        value = first_value
     else:
       value = self.doc(tpl)
     value = self.normalize_to_json_type(value)
@@ -128,9 +129,9 @@ class Generator:
 
   def doc(self, tpl=None):
     if tpl is None:
-      items = self.template.iteritems()
+      items = self.template.items()
     else:
-      items = tpl.iteritems()
+      items = tpl.items()
     doc = {key: self.generate_value(value) for key, value in items}
     if tpl is None:
       self.log.debug('Generated doc {}'.format(doc))
