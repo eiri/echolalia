@@ -3,53 +3,79 @@
 ![project: prototype](https://img.shields.io/badge/project-prototype-orange.svg "Project: Prototype")
 [![Build Status](https://github.com/eiri/echolalia/workflows/CI/badge.svg)](https://github.com/eiri/echolalia/actions)
 
-Generate random data to test your application
+Generate random data to test your application.
+
+## Requirements
+
+- Python 3.12 or 3.13
+- [uv](https://docs.astral.sh/uv/)
 
 ## Installation
 
-Clone repo with `git clone https://github.com/eiri/echolalia-prototype.git`, create and active virtual environment with `python -m venv venv` and  `. venv/bin/activate`, then install requirements with `pip install -r requirements.txt`.
+```bash
+git clone https://github.com/eiri/echolalia.git
+cd echolalia
+uv sync
+```
+
+`uv sync` creates the virtual environment and installs all dependencies.
 
 ## Usage
 
 ```bash
-$ ./echolalia.py -c 2 -t templates/people.json -w stdout
+$ uv run echolalia -c 2 -t templates/people.json
 [{"name": {"lastName": "Shannon", "firstName": "Rhonda"}, "tags": ["nihil", "fngheqnl", "impedit", "consequatur"], "age": 30, "state": "Hawaii, AR", "sex": "F", "phone": "03744269231", "single": true, "street": "4081 Sharon Ranch Apt. 197", "postcode": "ZIP: 02709-0053", "times": {"createdAt": "2017-02-13 13:14:08", "updatedAt": "2017-09-23 15:37:29"}, "email": "tiffany87@hotmail.com"}, {"name": {"lastName": "Hanson", "firstName": "Robert"}, "tags": ["quasi", "##tuesday###", "deserunt", "laborum"], "age": 104, "state": "Nevada, FL", "sex": "F", "phone": "(698)292-8761x6944", "single": false, "street": "3898 Alexandria Parkways", "postcode": "ZIP: 24439", "times": {"createdAt": "2017-05-03 03:16:21", "updatedAt": "2017-09-23 15:37:02"}, "email": "zfowler@hotmail.com"}]
 ```
 
 ```bash
-$ ./echolalia.py -c 2 -i name -i email=free_email -f csv
+$ uv run echolalia -c 2 -i name -i email=free_email -f csv
 Bruce Day,lori09@yahoo.com
 Janice Turner,matthew72@sanders.com
+```
 
+To skip the `uv run` prefix, activate the virtualenv first:
+
+```bash
+source .venv/bin/activate
+echolalia -c 2 -i name -i email=free_email -f csv
+```
+
+## Development
+
+```bash
+uv sync --dev
+uv run pytest
 ```
 
 ## Templates
 
-JSON document of expected structure where keys will be used as keys for generated document and values should be methods of [faker](https://github.com/joke2k/faker) library. If method suppose to get arguments, the value block should be defined as json object with "attr" for name of method and "args" for list of provided arguments.
+Templates are JSON objects. Keys become keys in the generated document; values are [faker](https://github.com/joke2k/faker) method names.
 
-While template must be an object, the keys can take list of methods to generate arrays. For complex values mustash style of template can be used (e.g. `"{state}, {state_abbr}"`). Additional element "postprocess" can be used to run specified command over generated value.
+To pass arguments to a method, use an object with `"attr"` and `"args"`:
 
-Take a look at `templates/people.json` file for example.
+```json
+{ "birthday": { "attr": "date_of_birth", "args": [null, 18, 65] } }
+```
+
+A key's value can also be a list of methods, which produces an array. For composite strings, use mustache syntax: `"{state}, {state_abbr}"`. To transform the result after generation, add a `"postprocess"` key with a `str` method name.
+
+See `templates/people.json` for a full example.
 
 ## Formatters
-### Raw
-Pass through, returns generated data as python object.
 
-### JSON
-Marshalls data to JSON.
+**raw** — returns the data as a Python object, no serialization.
 
-### CSV
-Marshalls data to CSV format. If command line argument `--with_headers` provided adds as a first line a list of keys. Generated object more than 1 level of depth smashed into string
+**json** — JSON output.
 
-### YAML
-Marshalls data in YAML. Collections always serialized in block style.
+**csv** — CSV output. Pass `--with_header` to add a header row. Nested objects are flattened to strings.
+
+**yaml** — YAML output, always in block style.
 
 ## Writers
-### StdOut
-This is a basic plugin that just outputs generated data on the standard output.
 
-### File
-Output to a specified with `-o` or `--output` file.
+**stdout** — prints to standard output (default).
+
+**file** — writes to a file; requires `-o`/`--output`.
 
 ## Licence
 

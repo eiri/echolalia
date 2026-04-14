@@ -1,16 +1,12 @@
-from __future__ import print_function
-import sys
-
 class Writer:
 
-  def __init__(self):
-    return None
+    def __init__(self) -> None:
+        pass
 
-  def add_args(self, parser):
-    parser.add_argument('-o', '--output', type=str, required=True)
-    return parser
+    def add_args(self, parser):
+        parser.add_argument("-o", "--output", type=str, required=True)
+        return parser
 
-  def write(self, args, docs):
-    with open(args.output, 'w') as f:
-        print(docs, file=f)
-
+    def write(self, args, docs) -> None:
+        with open(args.output, "w") as f:
+            print(docs, file=f)

@@ -2,24 +2,31 @@ name: CI
 
 on:
   push:
-    branches: ['master']
+    branches: ["master"]
   pull_request:
 
 jobs:
-  build:
+  test:
     strategy:
       matrix:
-        python: ['3.10', '3.11']
+        python: ["3.12", "3.13"]
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@cec208311dfd045dd5311c1add060b2062131d57 # v8.0.0
+        with:
+          version: "latest"
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
-          cache: pip
+
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        run: uv sync --dev
+
       - name: Run tests
-        run: pytest --cov=echolalia
+        run: uv run pytest
